@@ -7,11 +7,14 @@ from __future__ import unicode_literals
 
 import argparse
 
+DEFAULT_REGION = "us-east-1"
+
 
 def setup_arg_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-r", "--region", default="us-east-1",
-                        help="The AWS region to work in.")
+    parser.add_argument("-R", "--region", default=DEFAULT_REGION,
+                        help="The AWS region to work in. Default: {}".format(
+                            DEFAULT_REGION))
     parser.add_argument("-c", "--config", required=True, default=None,
                         help="The path to the config file")
     parser.add_argument("-d", "--dryrun", action="store_true",

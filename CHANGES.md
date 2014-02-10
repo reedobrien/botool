@@ -4,9 +4,12 @@ CHANGES
 Next Release (TBD)
 ------------------
 
-0.0.1 2014-02-07
+ - TBD
+
+0.1 (2014-02-10)
 ----------------
 
 - Initial release
+- IAM basics for creating roles, groups and users. Manages user roles, but everything else is add only right now.
 
 
