@@ -10,6 +10,7 @@ Purpose: Create groups, users, and roles from yaml config
 from __future__ import unicode_literals
 
 import logging
+import os
 import sys
 
 import botocore.session
@@ -26,7 +27,7 @@ def main():
     parser = setup_arg_parser()
     parser.add_argument("-u", "--users", action="store_true",
                         help="process users")
-    parser.add_argument("-o", "--output-dir", type=str,
+    parser.add_argument("-o", "--output_dir", type=str,
                         help="put creds for users here")
     parser.add_argument("-g", "--groups", action="store_true",
                         help="process users")
@@ -35,48 +36,72 @@ def main():
     parser.add_argument("-a", "--all", action="store_true",
                         help="Process users, groups, and roles")
     args = parse_args(parser)
-    botox = BTX(args.f, debug=args.verbose, dryrun=args.dryrun,
+    botox = BTX(args.config, debug=args.verbose, dryrun=args.dryrun,
                 region=args.region)
 
+    if args.all:
+        args.roles = args.groups = args.users = True
+
     if args.roles:
-        pass
-        # if botox.config["roles"]:
-        #     for role in botox.config["roles"]:
-        #         botox("CreateRole", role_name=role["role_name"],
-        #               assume_role_policy_document=role[
-        #                   "assume_role_policy_document"])
-        #         # botox("PutRolePolicy", **role)
-        #         botox("PutRolePolicy", role_name=role["role_name"],
-        #               policy_name=role["policy_name"],
-        #               policy_document=role["policy_document"])
+        if botox.config["roles"]:
+            for role in botox.config["roles"]:
+                botox("CreateRole", role_name=role["role_name"],
+                      assume_role_policy_document=role[
+                          "assume_role_policy_document"])
+                botox("PutRolePolicy", role_name=role["role_name"],
+                      policy_name=role["policy_name"],
+                      policy_document=role["policy_document"])
 
     if args.groups:
-        pass
-        # if botox.config["groups"]:
-        #     for group in botox.config["groups"]:
-        #         botox("CreateGroup", group_name=group["group_name"])
-        #         botox("PutGroupPolicy", **group)
+        if botox.config["groups"]:
+            for group in botox.config["groups"]:
+                botox("CreateGroup", group_name=group["group_name"])
+                botox("PutGroupPolicy", **group)
 
     if args.users:
-        pass
-        # if botox.config["users"]:
-        #     for user in botox.config["users"]:
-        #         user_name = user["user_name"]
-        #         groups = user["groups"]
-        #         if not botox("GetUser", user_name=user_name):
-        #             botox("CreateUser", user_name=user_name)
-        #         existing = botox("ListGroupsForUser", user_name=user_name).get("Groups", [])
-        #         if groups:
-        #             for group in groups:
-        #                 if group not in existing:
-        #                     botox("AddUserToGroup",
-        #                           user_name=user_name,
-        #                           group_name=group)
-        #         for membership in existing:
-        #             if membership["GroupName"] not in groups:
-        #                 botox("RemoveUserFromGroup",
-        #                       user_name=user_name,
-        #                       group_name=membership["GroupName"])
+        if botox.config["users"]:
+            for user in botox.config["users"]:
+                user_name = user["user_name"]
+                groups = user["groups"]
+                r, d = botox("GetUser", user_name=user_name)
+                if r.status_code == 404:
+                    r, d = botox("CreateUser", user_name=user_name)
+                    if r.ok:
+                        ## Only creates when we create a user
+                        ## add flag for creating key? prolly not since that is
+                        ## a one of and appropriate for the console.
+                        r, d = botox("CreateAccessKey", user_name=user_name)
+                        if r.ok:
+                            keys = sorted(d["AccessKey"].keys())
+                            if args.output_dir:
+                                if os.path.exists(args.output_dir):
+                                    assert os.path.isdir(args.output_dir)
+                                else:
+                                    os.makedirs(args.output_dir)
+                                path = os.path.join(args.output_dir,
+                                    "{}.csv".format(user_name))
+                            else:
+                                path = "{}.csv".format(user_name)
+                            with open(path, "w") as f:
+                                f.write(",".join(keys))
+                                f.write("\n")
+                                f.write(",".join([d["AccessKey"][k] for k
+                                        in keys]))
+                                f.write("\n")
+                r, d = botox("ListGroupsForUser", user_name=user_name)
+                if r.ok:
+                    existing = d.get("Groups", [])
+                if groups:
+                    for group in groups:
+                        if group not in existing:
+                            botox("AddUserToGroup",
+                                  user_name=user_name,
+                                  group_name=group)
+                for membership in existing:
+                    if membership["GroupName"] not in groups:
+                        botox("RemoveUserFromGroup",
+                              user_name=user_name,
+                              group_name=membership["GroupName"])
 
 if __name__ == "__main__":
     main()
