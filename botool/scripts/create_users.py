@@ -30,7 +30,7 @@ def main():
                         help="put creds for users here")
     parser.add_argument("-g", "--groups", action="store_true",
                         help="process users")
-    parser.add_argument("-R", "--roles", action="store_true",
+    parser.add_argument("-r", "--roles", action="store_true",
                         help="process users")
     parser.add_argument("-a", "--all", action="store_true",
                         help="Process users, groups, and roles")
