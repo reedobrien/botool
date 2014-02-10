@@ -28,13 +28,15 @@ def main():
     parser.add_argument("-u", "--users", action="store_true",
                         help="process users")
     parser.add_argument("-o", "--output_dir", type=str,
-                        help="put creds for users here")
+                        help="put creds for users here. "
+                        "Default: current directory")
     parser.add_argument("-p", "--policy_dir", type=str, default="policies",
-                        help="where policy documents (JSON) are located")
+                        help="where policy documents (JSON) are located. "
+                        "Default: ./policies")
     parser.add_argument("-g", "--groups", action="store_true",
-                        help="process users")
+                        help="process groups")
     parser.add_argument("-r", "--roles", action="store_true",
-                        help="process users")
+                        help="process roles")
     parser.add_argument("-a", "--all", action="store_true",
                         help="Process users, groups, and roles")
     args = parse_args(parser)
