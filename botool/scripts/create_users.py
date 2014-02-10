@@ -25,21 +25,24 @@ from botool.common import (
 
 def main():
     parser = setup_arg_parser()
-    parser.add_argument("-u", "--users", action="store_true",
-                        help="process users")
     parser.add_argument("-o", "--output_dir", type=str,
                         help="put creds for users here. "
                         "Default: current directory")
     parser.add_argument("-p", "--policy_dir", type=str, default="policies",
                         help="where policy documents (JSON) are located. "
                         "Default: ./policies")
-    parser.add_argument("-g", "--groups", action="store_true",
-                        help="process groups")
-    parser.add_argument("-r", "--roles", action="store_true",
-                        help="process roles")
     parser.add_argument("-a", "--all", action="store_true",
                         help="Process users, groups, and roles")
+    parser.add_argument("-r", "--roles", action="store_true",
+                        help="process roles")
+    parser.add_argument("-g", "--groups", action="store_true",
+                        help="process groups")
+    parser.add_argument("-u", "--users", action="store_true",
+                        help="process users")
     args = parse_args(parser)
+    if not args.all or args.roles or args.groups or args.users:
+        parser.error("No targets specified, "
+                     "must be one of -a, -r, -g, -u")
     botox = BTX(args.config, debug=args.verbose, dryrun=args.dryrun,
                 region=args.region)
 
