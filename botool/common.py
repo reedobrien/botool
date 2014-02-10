@@ -10,7 +10,7 @@ import argparse
 
 def setup_arg_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-r", "--region", default="us-east-1",
+    parser.add_argument("-R", "--region", default="us-east-1",
                         help="The AWS region to work in.")
     parser.add_argument("-c", "--config", required=True, default=None,
                         help="The path to the config file")
