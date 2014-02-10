@@ -1,5 +1,6 @@
 include README.md
 recursive-include *.md
 recursive-include btx *
+recursive-include scripts *.py
 include *
 global-exclude *.pyc
