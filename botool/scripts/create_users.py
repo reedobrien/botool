@@ -29,6 +29,8 @@ def main():
                         help="process users")
     parser.add_argument("-o", "--output_dir", type=str,
                         help="put creds for users here")
+    parser.add_argument("-p", "--policy_dir", type=str, default="policies",
+                        help="where policy documents (JSON) are located")
     parser.add_argument("-g", "--groups", action="store_true",
                         help="process users")
     parser.add_argument("-r", "--roles", action="store_true",
@@ -44,18 +46,24 @@ def main():
 
     if args.roles:
         if botox.config["roles"]:
+            assert os.path.isdir(args.policy_dir)
             for role in botox.config["roles"]:
                 botox("CreateRole", role_name=role["role_name"],
-                      assume_role_policy_document=role[
-                          "assume_role_policy_document"])
+                      assume_role_policy_document=botox.policy_string(
+                          os.path.join(args.policy_dir,
+                                       role["assume_role_policy_document"])))
                 botox("PutRolePolicy", role_name=role["role_name"],
                       policy_name=role["policy_name"],
-                      policy_document=role["policy_document"])
+                      policy_document=botox.policy_string(
+                          os.path.join(args.policy_dir, role["policy_document"]
+                                       )))
 
     if args.groups:
         if botox.config["groups"]:
             for group in botox.config["groups"]:
                 botox("CreateGroup", group_name=group["group_name"])
+                group["policy_document"] = botox.policy_string(os.path.join(
+                    args.policy_dir, group["policy_document"]))
                 botox("PutGroupPolicy", **group)
 
     if args.users:
@@ -79,7 +87,7 @@ def main():
                                 else:
                                     os.makedirs(args.output_dir)
                                 path = os.path.join(args.output_dir,
-                                    "{}.csv".format(user_name))
+                                                    "{}.csv".format(user_name))
                             else:
                                 path = "{}.csv".format(user_name)
                             with open(path, "w") as f:
