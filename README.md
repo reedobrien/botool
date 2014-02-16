@@ -7,7 +7,7 @@ TODO
 ----
 
 IAM
-___
+---
 
  - add backup flag to write out settings to file(s)
  - add capacity to remove users, groups, and roles
@@ -17,9 +17,6 @@ ___
 
 Example Config
 --------------
-
-IAM example
-___________
 
     service: IAM
 
@@ -63,7 +60,7 @@ Example Policies
 ----------------
 
 allow-assume-role-by-ec2-service.json
-_____________________________________
+-------------------------------------
 
     {
         "Statement":
@@ -85,7 +82,7 @@ _____________________________________
     }
 
 example-allow-rw-to-s3.json
-___________________________
+---------------------------
 
     {
         "Version":"2012-10-17",
