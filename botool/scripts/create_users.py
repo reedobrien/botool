@@ -62,6 +62,11 @@ def main():
                       policy_document=botox.policy_string(
                           os.path.join(args.policy_dir, role["policy_document"]
                                        )))
+        if botox.config["profiles"]:
+            for profile in botox.config["profiles"]:
+                botox("CreateInstanceProfile",
+                      instance_profile_name=profile["instance_profile_name"])
+                botox("AddRoleToInstanceProfile", **profile)
 
     if args.groups:
         if botox.config["groups"]:
