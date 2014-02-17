@@ -1,5 +1,5 @@
 """
-Copyright 2013 Reed O'Brien <reed@reedobrien.com>.
+Copyright 2014 Reed O'Brien <reed@reedobrien.com>.
 All rights reserved. Use of this source code is governed by a
 BSD-style license that can be found in the LICENSE file.
 """
@@ -17,7 +17,7 @@ requires = ["botocore", "pyaml", "btx"]
 tests_requires = requires + ['nose', 'coverage']
 
 setup(name='botool',
-      version='0.1',
+      version='0.1.1',
       description='A botocore helper lib',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
